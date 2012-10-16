@@ -1,8 +1,8 @@
 require 'bundler'
+require 'rspec/core/rake_task'
+
 Bundler::GemHelper.install_tasks
 
-require 'rake/testtask'
+RSpec::Core::RakeTask.new(:spec)
 
-Rake::TestTask.new do |t|
-  t.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
-end
+task :default => :spec
