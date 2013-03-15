@@ -1,5 +1,7 @@
 module HasOffers
+
   class Response
+
     attr_reader :test, :body, :http_status_code, :http_message, :http_headers
 
     def success?
@@ -54,9 +56,11 @@ module HasOffers
 
     def error_messages
       if data.is_a? Hash and data["errors"] and data["errors"]["error"]
-        get_error_values data["errors"]["error"]
-      elsif @body["response"]["errors"]
-        get_error_values @body["response"]["errors"]
+        data["errors"]["error"].map { |error| error["err_msg"] }
+      elsif @body["response"]["errors"] and !@body["response"]["errors"].empty?
+        @body["response"]["errors"].map { |error| error["err_msg"] }
+      elsif data.is_a? Hash and data["error_name"] and data["private_message"]
+        [data["private_message"]]
       else
         []
       end
@@ -81,14 +85,6 @@ module HasOffers
       @body['response']['data'] and @body['response']['data'].is_a?(Hash) and @body['response']['data'].has_key?('pageCount')
     end
 
-    private
-
-    def get_error_values(obj)
-      if obj.is_a? Hash
-        obj.values
-      elsif obj.is_a? Array
-        obj.map { |error| error["err_msg"] || error["publicMessage"] }
-      end
-    end
   end
+
 end
